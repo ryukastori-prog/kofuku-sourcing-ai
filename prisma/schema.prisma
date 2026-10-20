@@ -1,0 +1,86 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  companyName  String
+  contactName  String
+  phone        String?
+  website      String?
+  role         Role      @default(MEMBER)
+  createdAt    DateTime  @default(now())
+  products     Product[]
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  companyId        String
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name             String
+  nameEn           String?
+  category         String
+  description      String
+  specs            String?
+  priceJpy         Int?
+  minOrderQty      Int?
+  leadTimeDays     Int?
+  madeInJapan      Boolean       @default(true)
+  certifications   String?
+  exportExperience String?
+  targetMarkets    String?
+  imageUrl         String?
+  status           ProductStatus @default(SUBMITTED)
+  adminNote        String?
+  hubExportedAt    DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  evaluations      Evaluation[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model Evaluation {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  score            Int
+  summary          String
+  strengths        String[]
+  risks            String[]
+  suggestedMarkets String[]
+  criteriaId       String?
+  model            String
+  createdAt        DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Criteria {
+  id        String   @id @default(cuid())
+  body      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum ProductStatus {
+  SUBMITTED
+  APPROVED
+  ON_HOLD
+  REJECTED
+  EXPORTED
+}
