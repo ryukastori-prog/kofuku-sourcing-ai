@@ -64,3 +64,12 @@ export async function saveCriteria(formData: FormData) {
   ]);
   redirect("/admin/criteria?done=1");
 }
+
+export async function resetCriteriaToDefault() {
+  await requireAdmin();
+  await db.$transaction([
+    db.criteria.updateMany({ where: { active: true }, data: { active: false } }),
+    db.criteria.create({ data: { body: DEFAULT_CRITERIA, active: true } }),
+  ]);
+  redirect("/admin/criteria?done=1");
+}

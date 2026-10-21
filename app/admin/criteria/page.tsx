@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { getActiveCriteria, saveCriteria } from "../actions";
+import { getActiveCriteria, resetCriteriaToDefault, saveCriteria } from "../actions";
 
 export default async function CriteriaPage({
   searchParams,
@@ -25,6 +25,10 @@ export default async function CriteriaPage({
           <div className="actions">
             <button className="btn gold" type="submit">保存する</button>
           </div>
+        </form>
+        <form action={resetCriteriaToDefault} style={{ marginTop: 16 }}>
+          <p className="muted">配点・採点目安つきの推奨基準に置き換えます（今の内容は上書きされます）。</p>
+          <button className="btn" type="submit">推奨の基準に置き換える</button>
         </form>
       </div>
     </>
