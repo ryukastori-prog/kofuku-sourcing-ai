@@ -69,3 +69,18 @@ export async function resetCriteriaToDefault() {
   ]);
   redirect("/admin/criteria?done=1");
 }
+
+export async function extendTrial(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const kind = String(formData.get("kind") ?? "");
+  const c = await db.company.findUnique({ where: { id } });
+  if (!c || c.role !== "MEMBER") redirect("/admin/members");
+  if (kind === "days") {
+    const base = Math.max(Date.now(), c.trialEndsAt.getTime());
+    await db.company.update({ where: { id }, data: { trialEndsAt: new Date(base + 30 * 24 * 60 * 60 * 1000) } });
+  } else if (kind === "evals") {
+    await db.company.update({ where: { id }, data: { bonusEvals: { increment: 5 } } });
+  }
+  redirect("/admin/members?done=1");
+}

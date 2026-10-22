@@ -24,6 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <>
                   <span>{user.companyName}</span>
                   <Link href="/dashboard">商品一覧</Link>
+                  <Link href="/account">アカウント</Link>
                   {user.role === "ADMIN" && <Link href="/admin">管理画面</Link>}
                   <form action={logout}>
                     <button type="submit">ログアウト</button>
@@ -39,6 +40,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </header>
         <main>{children}</main>
+        <footer className="footer">
+          <Link href="/guide">ご利用ガイド</Link>
+          <Link href="/terms">利用規約</Link>
+          <Link href="/privacy">プライバシーポリシー</Link>
+          <a href="https://kofukutrading.com/contact-us/" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
+          <span>© 宏福商事合同会社</span>
+        </footer>
       </body>
     </html>
   );

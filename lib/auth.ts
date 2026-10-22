@@ -50,7 +50,7 @@ export async function getUser() {
     if (!payload.sub) return null;
     return await db.company.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, companyName: true, contactName: true, role: true, trialEndsAt: true },
+      select: { id: true, email: true, companyName: true, contactName: true, role: true, trialEndsAt: true, bonusEvals: true },
     });
   } catch {
     return null;

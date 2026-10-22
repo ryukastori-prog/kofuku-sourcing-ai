@@ -26,6 +26,7 @@ export default async function AdminHome({
     <>
       <h1>管理画面</h1>
       <div className="actions" style={{ marginTop: 0, marginBottom: 16 }}>
+        <Link className="btn ghost small" href="/admin/members">会員一覧</Link>
         <Link className="btn ghost small" href="/admin/criteria">AI評価の基準を編集</Link>
         <a className="btn ghost small" href="/admin/export">採用商品をCSVで書き出す</a>
       </div>

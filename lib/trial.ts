@@ -21,17 +21,19 @@ export async function getTrialInfo(user: {
   id: string;
   role: "MEMBER" | "ADMIN";
   trialEndsAt: Date;
+  bonusEvals: number;
 }): Promise<TrialInfo> {
   const used = await db.evaluation.count({
     where: { byMember: true, product: { companyId: user.id } },
   });
   const active = user.trialEndsAt.getTime() > Date.now();
-  const remaining = Math.max(0, TRIAL_EVAL_LIMIT - used);
+  const limit = TRIAL_EVAL_LIMIT + user.bonusEvals;
+  const remaining = Math.max(0, limit - used);
   if (user.role === "ADMIN") {
     return { unlimited: true, active, endsAt: user.trialEndsAt, used, remaining, canEvaluate: true };
   }
   let reason: string | undefined;
   if (!active) reason = "無料期間が終了しました。引き続きご利用いただく方法は、運営からご案内します。";
-  else if (remaining <= 0) reason = `無料期間中のAI診断は${TRIAL_EVAL_LIMIT}回までです。上限に達しました。`;
+  else if (remaining <= 0) reason = `AI診断の上限（${limit}回）に達しました。`;
   return { unlimited: false, active, endsAt: user.trialEndsAt, used, remaining, canEvaluate: !reason, reason };
 }
