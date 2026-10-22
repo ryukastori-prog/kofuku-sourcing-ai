@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { createSession, destroySession, isAdminEmail } from "@/lib/auth";
+import { trialEndDate } from "@/lib/trial";
 
 const RegisterSchema = z.object({
   email: z.string().trim().toLowerCase().email("メールアドレスの形式が正しくありません"),
@@ -43,6 +44,7 @@ export async function register(formData: FormData) {
       phone: d.phone,
       website: d.website,
       role: isAdminEmail(d.email) ? "ADMIN" : "MEMBER",
+      trialEndsAt: trialEndDate(),
     },
   });
   await createSession(company.id);

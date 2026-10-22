@@ -18,6 +18,7 @@ model Company {
   website      String?
   role         Role      @default(MEMBER)
   createdAt    DateTime  @default(now())
+  trialEndsAt  DateTime
   products     Product[]
 }
 
@@ -60,6 +61,7 @@ model Evaluation {
   suggestedMarkets String[]
   criteriaId       String?
   model            String
+  byMember         Boolean  @default(false)
   createdAt        DateTime @default(now())
 
   @@index([productId])

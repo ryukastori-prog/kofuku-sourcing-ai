@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { STATUS_LABEL } from "@/lib/constants";
+import { getTrialInfo } from "@/lib/trial";
 
 export default async function Dashboard({
   searchParams,
@@ -14,10 +15,18 @@ export default async function Dashboard({
     where: { companyId: user.id },
     orderBy: { createdAt: "desc" },
   });
+  const trial = await getTrialInfo(user);
   return (
     <>
       <h1>登録した商品</h1>
       {saved && <div className="notice">保存しました。</div>}
+      {!trial.unlimited && (
+        <div className="notice">
+          {trial.active
+            ? `無料期間: ${trial.endsAt.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })}まで ／ AI診断の残り: ${trial.remaining}回`
+            : "無料期間は終了しました。引き続きご利用いただく方法は、運営からご案内します。"}
+        </div>
+      )}
       <div className="actions" style={{ marginTop: 0, marginBottom: 16 }}>
         <Link className="btn gold" href="/products/new">商品を登録する</Link>
       </div>

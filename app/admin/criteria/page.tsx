@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { getActiveCriteria, resetCriteriaToDefault, saveCriteria } from "../actions";
+import { resetCriteriaToDefault, saveCriteria } from "../actions";
+import { getActiveCriteria } from "@/lib/criteria";
 
 export default async function CriteriaPage({
   searchParams,

@@ -6,11 +6,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { AI_MODEL, evaluateProduct } from "@/lib/ai";
 import { DEFAULT_CRITERIA } from "@/lib/constants";
-
-export async function getActiveCriteria() {
-  const c = await db.criteria.findFirst({ where: { active: true }, orderBy: { createdAt: "desc" } });
-  return c ?? { id: null as string | null, body: DEFAULT_CRITERIA };
-}
+import { getActiveCriteria } from "@/lib/criteria";
 
 export async function runEvaluation(formData: FormData) {
   await requireAdmin();

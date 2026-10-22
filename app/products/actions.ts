@@ -3,7 +3,11 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
+import { AI_MODEL, evaluateProduct } from "@/lib/ai";
+import { getActiveCriteria } from "@/lib/criteria";
+import { getTrialInfo } from "@/lib/trial";
 import { CATEGORIES } from "@/lib/constants";
 
 const optText = (max: number) =>
@@ -77,4 +81,29 @@ export async function deleteProduct(formData: FormData) {
   const id = str(formData, "id");
   await db.product.deleteMany({ where: { id, companyId: user.id, status: { not: "EXPORTED" } } });
   redirect("/dashboard");
+}
+
+export async function selfEvaluate(formData: FormData) {
+  const user = await requireUser();
+  const id = String(formData.get("id") ?? "");
+  const path = `/products/${id}`;
+  const product = await db.product.findFirst({ where: { id, companyId: user.id } });
+  if (!product) redirect("/dashboard");
+
+  const trial = await getTrialInfo(user);
+  if (!trial.canEvaluate) {
+    redirect(`${path}?error=${encodeURIComponent(trial.reason ?? "AI診断を実行できません")}`);
+  }
+  try {
+    const criteria = await getActiveCriteria();
+    const result = await evaluateProduct(product, criteria.body);
+    await db.evaluation.create({
+      data: { productId: id, criteriaId: criteria.id, model: AI_MODEL, byMember: true, ...result },
+    });
+  } catch {
+    // 内部のエラー内容は会員には見せない
+    redirect(`${path}?error=${encodeURIComponent("AI診断に失敗しました。時間をおいてもう一度お試しください（回数は消費されません）")}`);
+  }
+  revalidatePath(path);
+  redirect(`${path}?done=1`);
 }
